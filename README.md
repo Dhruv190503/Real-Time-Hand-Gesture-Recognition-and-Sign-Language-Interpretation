@@ -1,0 +1,1 @@
+This project used python Libraries like opencv to implement average filtering, mean filtering, gaussian filtering and median filtering. It also implemented log transformation, gamma transformation, binarization and negative image.
