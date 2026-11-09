@@ -1,29 +1,33 @@
 # Real-Time Hand Gesture Recognition
 
-A computer vision and deep learning project that recognizes hand gestures representing the English alphabet (A–Z) and the digit **0**. The system processes hand images using OpenCV and classifies them with a Convolutional Neural Network (CNN), with potential applications in gesture-based human-computer interaction and assistive technology.
+A computer vision and deep learning project that recognizes static hand gestures representing the English alphabet (A–Z) and the digit **0**. The system uses OpenCV for image preprocessing and a Convolutional Neural Network (CNN) built with TensorFlow/Keras for gesture classification. It also includes a real-time webcam interface for predicting hand gestures.
 
 ## Overview
 
-Traditional input devices are not always the most intuitive way to interact with computers. This project explores gesture-based interaction by combining image processing and deep learning to identify hand gestures.
+This project explores gesture-based human-computer interaction using image processing and deep learning.
 
-The model is trained on labeled hand gesture images and uses a CNN to classify each image into one of 27 categories.
+A CNN is trained on labeled hand gesture images to classify each image into one of 27 categories: the letters A–Z and the digit 0. The trained model is then used in a webcam-based application to perform real-time gesture predictions.
 
 ## Features
 
-- **27-class classification:** Recognizes gestures corresponding to A–Z and 0.
-- **Image preprocessing:** Applies grayscale conversion, Gaussian blurring, adaptive thresholding, and image resizing.
-- **CNN-based classification:** Uses convolutional and max-pooling layers to learn visual features.
+- **27-class classification:** Recognizes static hand gestures corresponding to A–Z and 0.
+- **Image preprocessing:** Uses grayscale conversion, Gaussian blurring, adaptive thresholding, and Otsu thresholding.
+- **CNN-based classification:** Learns visual features through convolutional and max-pooling layers.
 - **Model regularization:** Uses dropout layers to help reduce overfitting.
 - **Model checkpointing:** Saves model checkpoints based on validation loss.
-- **Extensible design:** Provides a foundation for real-time gesture interfaces and assistive applications.
+- **Real-time prediction:** Uses a webcam to capture and classify hand gestures.
+- **Text generation:** Converts predicted gesture labels into a text sequence.
 
 ## Tech Stack
 
-- **Language:** Python
-- **Deep Learning:** TensorFlow / Keras
-- **Computer Vision:** OpenCV
-- **Data Processing:** NumPy
-- **Visualization:** Matplotlib
+| Category | Technologies |
+|---|---|
+| Programming Language | Python |
+| Deep Learning | TensorFlow, Keras |
+| Computer Vision | OpenCV |
+| Data Processing | NumPy |
+| Visualization | Matplotlib |
+| Development Environment | Jupyter Notebook |
 
 ## Model Architecture
 
@@ -44,23 +48,23 @@ The project uses a Convolutional Neural Network with the following architecture:
 | Fully Connected | 64 units, ReLU |
 | Output | 27 units, Softmax |
 
-The network is trained using the **Adam optimizer** and categorical cross-entropy loss, with accuracy tracked as a training metric.
+The model is compiled using the **Adam optimizer** and categorical cross-entropy loss, with accuracy as the evaluation metric.
 
 ## Image Preprocessing
 
-Each input image goes through the following preprocessing pipeline:
+The same preprocessing pipeline is used during training and real-time inference:
 
-1. Load the image using OpenCV.
-2. Convert the image to grayscale.
-3. Apply Gaussian blur to reduce noise.
-4. Apply adaptive thresholding and Otsu thresholding to emphasize the hand shape.
+1. Convert the input image to grayscale.
+2. Apply Gaussian blur to reduce noise.
+3. Apply adaptive Gaussian thresholding.
+4. Apply Otsu thresholding with a minimum threshold value of 70.
 5. Resize the processed image to 128 × 128 pixels.
 6. Normalize pixel values to the range [0, 1].
-7. Reshape the image for input into the CNN.
+7. Reshape the image into the format expected by the CNN: `(1, 128, 128, 1)` for a single prediction.
 
 ## Dataset Structure
 
-Organize the training images into folders named after their respective gesture labels:
+The training dataset is organized into folders corresponding to each gesture class:
 
 ```text
 dataset/
@@ -75,9 +79,9 @@ dataset/
     └── Z/
 ```
 
-Each folder should contain images belonging to its corresponding class.
+Each folder contains images belonging to its corresponding class.
 
-> **Note:** The dataset used in the original notebook is stored locally. You must provide your own dataset or configure the path to your existing dataset before running the notebook.
+**Note:** The original dataset is not included in this repository. You will need to provide your own dataset or configure the notebook to use your existing dataset.
 
 ## Installation
 
@@ -88,63 +92,82 @@ git clone https://github.com/<your-username>/<your-repository>.git
 cd <your-repository>
 ```
 
-Install the required Python packages:
+Install the required dependencies:
 
 ```bash
 pip install numpy opencv-python tensorflow matplotlib jupyter
 ```
 
-If your environment uses a standalone Keras installation, ensure it is compatible with your TensorFlow version.
-
-## Training
+## Training the Model
 
 1. Place the dataset in the expected folder structure.
-2. Open the Jupyter notebook.
-3. Update the dataset path in the notebook to match your local environment.
-4. Run the notebook cells to load, preprocess, and encode the images.
+2. Open the training Jupyter notebook.
+3. Update the dataset path to match your local environment.
+4. Run the notebook cells to load and preprocess the images.
 5. Train the CNN using the configured training and validation split.
 6. Review the training and validation loss and accuracy plots.
 7. Save the trained model.
 
-The notebook trains for up to **50 epochs**, uses a **30% validation split**, and saves the best checkpoint according to validation loss.
+The training configuration includes:
 
-The final model is saved as:
+- Maximum epochs: **50**
+- Validation split: **30%** of the training data
+- Optimizer: **Adam**
+- Loss function: **Categorical Cross-Entropy**
+- Checkpoint monitoring: **Validation Loss**
+
+The trained model is saved as:
 
 ```text
 asl_classifier50.keras
 ```
 
-Training duration and performance depend on the dataset, hardware, and software environment.
+## Real-Time Gesture Recognition
+
+The second notebook uses the trained model to recognize hand gestures through a webcam.
+
+To run the real-time application:
+
+1. Train the model or obtain the trained `asl_classifier50.keras` file.
+2. Place the model file in the directory from which the inference notebook is run.
+3. Connect a webcam to your computer.
+4. Open the real-time inference notebook.
+5. Run the cells to initialize the webcam and load the model.
+6. Position your hand inside the displayed region of interest.
+7. The model predicts the gesture and displays the corresponding label.
+
+Press **ESC** to exit the webcam application.
+
+**Note:** The current inference implementation uses a fixed region of interest. Prediction accuracy can depend on hand positioning, lighting, background, and camera conditions.
 
 ## Model Evaluation
 
-The notebook plots training and validation loss and accuracy to help assess model learning and generalization.
+The training notebook evaluates the model using a held-out test split and plots training and validation accuracy and loss.
 
-No verified test-set accuracy is reported here. Evaluate the trained model on unseen images before reporting final performance metrics.
+The notebook reports a test accuracy of approximately **99.84%**. This result reflects performance on the dataset split used during training and should not be interpreted as a guarantee of real-world webcam accuracy.
+
+Independent testing across different users, backgrounds, lighting conditions, and camera positions is recommended to assess generalization.
 
 ## Applications
 
 - Gesture-based human-computer interaction
+- Hand gesture recognition
 - Assistive technology prototypes
-- Hand gesture classification
+- Gesture-controlled applications
 - Foundations for sign-language-related recognition systems
-- Gesture-controlled applications and devices
 
-**Scope:** This project classifies 27 static gesture classes. It does not, by itself, establish full sign-language understanding, which can require additional gestures, temporal information, facial expressions, and contextual interpretation.
+**Scope:** This project classifies 27 static hand gesture classes. It is not a complete sign-language translation system. Full sign-language understanding can require temporal information, facial expressions, additional gestures, and linguistic context.
 
 ## Future Improvements
 
-- Add a real-time webcam inference interface.
-- Evaluate performance on an independent test dataset.
-- Improve robustness to lighting, background, and hand-position variations.
-- Add confidence thresholds and prediction smoothing.
-- Expand the supported gesture vocabulary.
-- Integrate gesture predictions with external applications or devices.
-
-## License
-
-Add a license file to specify how others may use, modify, and distribute this project.
+- Implement prediction smoothing to reduce unstable frame-by-frame predictions.
+- Improve character-entry logic to prevent repeated predictions while holding a gesture.
+- Add a neutral or blank gesture class.
+- Improve robustness to different lighting conditions, backgrounds, and hand positions.
+- Evaluate the model on an independent dataset with images from different users.
+- Expand the gesture vocabulary.
+- Integrate gesture recognition with external applications.
 
 ---
 
-**Developed as a computer vision and deep learning project using Python, OpenCV, and TensorFlow/Keras.**
+**Developed using Python, OpenCV, TensorFlow, and Keras.**
